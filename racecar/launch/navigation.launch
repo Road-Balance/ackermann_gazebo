@@ -1,0 +1,44 @@
+<launch>
+  <!-- Arguments -->
+  <arg name="model" default="racecar" doc="model type [burger, waffle, waffle_pi]" />
+  <arg name="map_file" default="$(find racecar)/maps/swimming_room.yaml" />
+  <arg name="open_rviz" default="true" />
+  <arg name="move_forward_only" default="false" />
+
+  <!-- launch script arguments -->
+  <include file="$(find racecar)/launch/teleop.launch"></include>
+
+  <!-- Map server -->
+  <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)" />
+
+  <!-- AMCL -->
+  <include file="$(find racecar)/launch/amcl.launch" />
+
+  <!-- move_base -->
+  <!-- <include file="$(find turtlebot3_navigation)/launch/move_base.launch">
+    <arg name="model" value="$(arg model)" />
+    <arg name="move_forward_only" value="$(arg move_forward_only)"/>
+  </include> -->
+
+  <node name="cmd_vel_to_ackermann_drive" type="cmd_vel_to_ackermann_drive.py" pkg="racecar" output="screen" />
+
+  <!--  ************** Navigation ***************  -->
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <rosparam file="$(find racecar)/config/carlike/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find racecar)/config/carlike/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find racecar)/config/carlike/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find racecar)/config/carlike/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find racecar)/config/carlike/teb_local_planner_params.yaml" command="load" />
+
+    <param name="base_global_planner" value="global_planner/GlobalPlanner" />
+    <param name="planner_frequency" value="1.0" />
+    <param name="planner_patience" value="5.0" />
+
+    <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
+    <param name="controller_frequency" value="5.0" />
+    <param name="controller_patience" value="15.0" />
+
+    <param name="clearing_rotation_allowed" value="false" /> <!-- Our carlike robot is not able to rotate in place -->
+  </node>
+
+</launch>
