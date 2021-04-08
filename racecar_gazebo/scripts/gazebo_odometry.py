@@ -15,6 +15,7 @@ import numpy as np
 import math
 import tf2_ros
 
+
 class OdometryNode:
     # Set publishers
     pub_odom = rospy.Publisher('/vesc/odom', Odometry, queue_size=1)
@@ -26,12 +27,13 @@ class OdometryNode:
         self.last_recieved_stamp = None
 
         # Set the update rate
-        rospy.Timer(rospy.Duration(.05), self.timer_callback) # 20hz
+        rospy.Timer(rospy.Duration(.05), self.timer_callback)  # 20hz
 
         self.tf_pub = tf2_ros.TransformBroadcaster()
 
         # Set subscribers
-        rospy.Subscriber('/gazebo/link_states', LinkStates, self.sub_robot_pose_update)
+        rospy.Subscriber('/gazebo/link_states', LinkStates,
+                         self.sub_robot_pose_update)
 
     def sub_robot_pose_update(self, msg):
         # Find the index of the racecar
@@ -52,8 +54,8 @@ class OdometryNode:
 
         cmd = Odometry()
         cmd.header.stamp = self.last_recieved_stamp
-        cmd.header.frame_id = 'map'
-        cmd.child_frame_id = 'odom'
+        cmd.header.frame_id = 'odom'
+        cmd.child_frame_id = 'base_link'
         cmd.pose.pose = self.last_received_pose
         cmd.twist.twist = self.last_received_twist
         self.pub_odom.publish(cmd)
@@ -70,6 +72,7 @@ class OdometryNode:
             )
         )
         self.tf_pub.sendTransform(tf)
+
 
 # Start the node
 if __name__ == '__main__':
