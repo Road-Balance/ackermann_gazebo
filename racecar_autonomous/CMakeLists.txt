@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   move_base
   gmapping
   teleop_twist_keyboard
+  dynamic_reconfigure
 )
 
 ## System dependencies are found with CMake's conventions
