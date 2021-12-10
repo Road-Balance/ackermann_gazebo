@@ -1,0 +1,8 @@
+# noetic
+
+sudo apt update
+rosdep install -y -r -q --from-paths src --ignore-src --rosdistro noetic
+cma
+
+=> OK !
+
